@@ -58,7 +58,7 @@ namespace UDPer
 
     
     
-    class Program
+  /*  class Program
     {
         static void Main(string[] args)
         {
@@ -85,4 +85,5 @@ namespace UDPer
             } while (true);
         }
     }
+   */
 }
