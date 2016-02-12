@@ -10,6 +10,7 @@ public class NetworkManager : MonoBehaviour {
 
     void start()
     {
+
         MasterServer.ipAddress = Network.player.ipAddress;
         MasterServer.port = 23466;
     }
@@ -39,8 +40,11 @@ public class NetworkManager : MonoBehaviour {
                 StartServer();
 
             if (GUI.Button(new Rect(100, 250, 250, 100), "Refresh Hosts"))
+            {
+                //MasterServer.ipAddress = MyNetworkDiscovery.serverIP;
+                //MasterServer.port = 23466;
                 RefreshHostList();
-
+            }
 
 
             
