@@ -1,21 +1,24 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class NetworkManager : MonoBehaviour {
 
     private const string typeName = "UniqueGameName";
     private const string gameName = "RoomName";
    // NetworkView networkView;
-
+    [SerializeField]
+    private ToggleGroup turbulenceGroup;
 
     void start()
     {
-
-        MasterServer.ipAddress = Network.player.ipAddress;
-        MasterServer.port = 23466;
+        RefreshHostList();
+       // MasterServer.ipAddress = Network.player.ipAddress;
+        //MasterServer.port = 23466;
     }
     private void StartServer()
     {
+      
         
        // Network.InitializeServer();
         //Network.
@@ -31,8 +34,21 @@ public class NetworkManager : MonoBehaviour {
         Debug.Log("Server Initializied");
     }
 
+    public void startClient()
+    {
+        RefreshHostList();
+        for (int i = 0; i < 2; i++) 
+        { 
+            if (hostList != null)
+            {
+                JoinServer(hostList[0]);
+            }
+            else
+                Debug.Log("Erro!");
+        }
+    }
 
-    void OnGUI()
+   /* void OnGUI()
     {
         if (!Network.isClient && !Network.isServer)
         {
@@ -64,7 +80,17 @@ public class NetworkManager : MonoBehaviour {
 
         if (GUI.Button(new Rect(400, 250, 250, 100), "Teste"))
             GetComponent<NetworkView>().RPC("ReceiveSimpleMessage", RPCMode.Server, "Hello world");
+    }*/
+
+
+    public void setTurbulence()
+    {
+        
+          Toggle to = (Toggle)turbulenceGroup.ActiveToggles();
+        
+          GetComponent<NetworkView>().RPC("receiveTurbulenceChange", RPCMode.Server, to.name);
     }
+
 
     private HostData[] hostList;
 
@@ -92,6 +118,13 @@ public class NetworkManager : MonoBehaviour {
 
        // if (networkView.isMine)
             
+    }
+
+    [RPC]
+    void receiveTurbulenceChange(string toggle)
+    {
+        Debug.Log("Active turbulence toggle is  " + toggle);
+        //send
     }
 
 
