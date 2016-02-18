@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class NetworkManager : MonoBehaviour {
 
@@ -85,10 +86,11 @@ public class NetworkManager : MonoBehaviour {
 
     public void setTurbulence()
     {
+
+        List<Toggle> tos = new List<Toggle>(turbulenceGroup.ActiveToggles());
+        // tos[0] = null;
         
-          Toggle to = (Toggle)turbulenceGroup.ActiveToggles();
-        
-          GetComponent<NetworkView>().RPC("receiveTurbulenceChange", RPCMode.Server, to.name);
+          GetComponent<NetworkView>().RPC("receiveTurbulenceChange", RPCMode.Server, tos[0].name);
     }
 
 
