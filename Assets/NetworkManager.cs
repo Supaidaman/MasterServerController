@@ -10,7 +10,12 @@ public class NetworkManager : MonoBehaviour {
    // NetworkView networkView;
     [SerializeField]
     private ToggleGroup turbulenceGroup;
+    [SerializeField]
+    private InputField hourField;
+    [SerializeField]
+    private InputField minutesField;
 
+    private enum ClimateStates {aberto, nublado, chuvoso, temporal }
     void start()
     {
         RefreshHostList();
@@ -94,6 +99,35 @@ public class NetworkManager : MonoBehaviour {
     }
 
 
+    public void setTime()
+    {
+        string time= hourField.text + ":" + minutesField.text;
+        
+        // tos[0] = null;
+
+        GetComponent<NetworkView>().RPC("receiveTimeChange", RPCMode.Server,time);
+    }
+
+    public void cleanPressed()
+    {
+        GetComponent<NetworkView>().RPC("receiveClimateChange", RPCMode.Server, (int)ClimateStates.aberto);
+    }
+
+    public void cloudyPressed()
+    {
+        GetComponent<NetworkView>().RPC("receiveClimateChange", RPCMode.Server, (int)ClimateStates.nublado);
+    }
+
+    public void rainyPressed()
+    {
+        GetComponent<NetworkView>().RPC("receiveClimateChange", RPCMode.Server, (int)ClimateStates.chuvoso);
+    }
+
+    public void stormPressed()
+    {
+        GetComponent<NetworkView>().RPC("receiveClimateChange", RPCMode.Server, (int)ClimateStates.temporal);
+    }
+
     private HostData[] hostList;
 
     private void RefreshHostList()
@@ -122,10 +156,29 @@ public class NetworkManager : MonoBehaviour {
             
     }
 
+
+    [RPC]
+    void receiveClimateChange(int clima)
+    {
+        Debug.Log("received >" + clima);
+
+        // if (networkView.isMine)
+
+    }
+
+
     [RPC]
     void receiveTurbulenceChange(string toggle)
     {
         Debug.Log("Active turbulence toggle is  " + toggle);
+        //send
+    }
+
+    [RPC]
+    void receiveTimeChange(string time)
+    {
+        Debug.Log("New time is  " + time);
+       // messageManager.handleTime(time);
         //send
     }
 
