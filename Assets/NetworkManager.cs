@@ -14,6 +14,8 @@ public class NetworkManager : MonoBehaviour {
     private InputField hourField;
     [SerializeField]
     private InputField minutesField;
+    [SerializeField]
+    private  InputField LabelText;
 
     private enum ClimateStates {aberto, nublado, chuvoso, temporal }
     void start()
@@ -24,7 +26,8 @@ public class NetworkManager : MonoBehaviour {
     }
     private void StartServer()
     {
-      
+        MasterServer.ipAddress = LabelText.text;
+        MasterServer.port = 23466;
         
        // Network.InitializeServer();
         //Network.
@@ -129,6 +132,7 @@ public class NetworkManager : MonoBehaviour {
     }
 
     private HostData[] hostList;
+   
 
     private void RefreshHostList()
     {
