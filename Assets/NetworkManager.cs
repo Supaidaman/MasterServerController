@@ -18,15 +18,16 @@ public class NetworkManager : MonoBehaviour {
     private  InputField LabelText;
 
     private enum ClimateStates {aberto, nublado, chuvoso, temporal }
-    void start()
+    void Start()
     {
-        RefreshHostList();
+       // RefreshHostList();
        // MasterServer.ipAddress = Network.player.ipAddress;
-        //MasterServer.port = 23466;
+      // MasterServer.port = 23466;
     }
     private void StartServer()
     {
         MasterServer.ipAddress = LabelText.text;
+        Debug.Log(LabelText.text);
         MasterServer.port = 23466;
         
        // Network.InitializeServer();
@@ -45,15 +46,23 @@ public class NetworkManager : MonoBehaviour {
 
     public void startClient()
     {
+        MasterServer.ipAddress = LabelText.text;
+        Debug.Log(LabelText.text);
+        MasterServer.port = 23466;
         RefreshHostList();
-        for (int i = 0; i < 2; i++) 
-        { 
+        for (int i = 0; i < 2; i++)
+        {
+            
+
             if (hostList != null)
             {
                 JoinServer(hostList[0]);
             }
             else
+            {
+                Debug.Log(LabelText.text);
                 Debug.Log("Erro!");
+            }
         }
     }
 
