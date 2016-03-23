@@ -49,12 +49,18 @@ public class NetworkManager : MonoBehaviour {
         MasterServer.ipAddress = LabelText.text;
         Debug.Log(LabelText.text);
         MasterServer.port = 23466;
-        RefreshHostList();
+        
         for (int i = 0; i < 2; i++)
         {
-            
+            RefreshHostList();
+            StartCoroutine(WaitForSeconds());
+        }
+    }
 
-            if (hostList != null)
+    private IEnumerator WaitForSeconds()
+    {
+        yield return new WaitForSeconds(10);
+        if (hostList != null)
             {
                 JoinServer(hostList[0]);
             }
@@ -63,7 +69,8 @@ public class NetworkManager : MonoBehaviour {
                 Debug.Log(LabelText.text);
                 Debug.Log("Erro!");
             }
-        }
+            
+       
     }
 
    /* void OnGUI()
