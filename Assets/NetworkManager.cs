@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System;
 
 public class NetworkManager : MonoBehaviour {
 
@@ -11,23 +12,28 @@ public class NetworkManager : MonoBehaviour {
     [SerializeField]
     private ToggleGroup turbulenceGroup;
     [SerializeField]
+    private ToggleGroup stressGroup;
+    [SerializeField]
     private InputField hourField;
     [SerializeField]
     private InputField minutesField;
     [SerializeField]
-    private  InputField LabelText;
-
+    private  InputField labelText;
+    [SerializeField]
+    private Button connectButton;
+    private Text buttonText;
     private enum ClimateStates {aberto, nublado, chuvoso, temporal }
     void Start()
     {
+        buttonText = connectButton.GetComponentInChildren<Text>();
        // RefreshHostList();
        // MasterServer.ipAddress = Network.player.ipAddress;
       // MasterServer.port = 23466;
     }
     private void StartServer()
     {
-        MasterServer.ipAddress = LabelText.text;
-        Debug.Log(LabelText.text);
+        MasterServer.ipAddress = labelText.text;
+        Debug.Log(labelText.text);
         MasterServer.port = 23466;
         
        // Network.InitializeServer();
@@ -46,10 +52,11 @@ public class NetworkManager : MonoBehaviour {
 
     public void startClient()
     {
-        MasterServer.ipAddress = LabelText.text;
-        Debug.Log(LabelText.text);
+        MasterServer.ipAddress = labelText.text;
+        Debug.Log(labelText.text);
         MasterServer.port = 23466;
-        
+        buttonText.text = "Conectando";
+        connectButton.interactable = false;
         for (int i = 0; i < 2; i++)
         {
             RefreshHostList();
@@ -62,12 +69,38 @@ public class NetworkManager : MonoBehaviour {
         yield return new WaitForSeconds(10);
         if (hostList != null)
             {
-                JoinServer(hostList[0]);
+                try
+                {
+                    JoinServer(hostList[0]);
+                    connectButton.interactable = false;
+                    buttonText.text = "Conectado!";
+                }
+                catch
+                {
+                    Debug.Log("Erro!");
+
+                    Network.Disconnect();
+                    connectButton.interactable = true;
+                   buttonText.text = "Conectar!";
+                }
             }
             else
             {
-                Debug.Log(LabelText.text);
-                Debug.Log("Erro!");
+               // try
+               // {
+                    Debug.Log(labelText.text);
+                    Debug.Log("Erro!");
+                    Network.Disconnect();
+                    connectButton.interactable = true;
+                    buttonText.text = "Conectar!";
+               // }
+               // catch 
+               // {
+
+                    //Network.Disconnect();
+                    connectButton.interactable = true;
+                    buttonText.text = "Conectar!";
+                //}
             }
             
        
@@ -117,6 +150,14 @@ public class NetworkManager : MonoBehaviour {
           GetComponent<NetworkView>().RPC("receiveTurbulenceChange", RPCMode.Server, tos[0].name);
     }
 
+    public void setStressLevel()
+    {
+
+        List<Toggle> strt = new List<Toggle>(stressGroup.ActiveToggles());
+        // tos[0] = null;
+
+        GetComponent<NetworkView>().RPC("receiveStressChange", RPCMode.Server, strt[0].name);
+    }
 
     public void setTime()
     {
@@ -193,6 +234,12 @@ public class NetworkManager : MonoBehaviour {
         Debug.Log("Active turbulence toggle is  " + toggle);
         //send
     }
+    [RPC]
+    void receiveStressChange(string toggle)
+    {
+        Debug.Log("Active stress toggle is  " + toggle);
+        //send
+    }
 
     [RPC]
     void receiveTimeChange(string time)
@@ -206,5 +253,12 @@ public class NetworkManager : MonoBehaviour {
     void OnConnectedToServer()
     {
         Debug.Log("Server Joined");
+    }
+
+    void OnDisconnectedFromServer(NetworkDisconnection info)
+    {
+        connectButton.interactable = true;
+        buttonText.text = "Conectar!";
+        Debug.Log("Disconnected from server: " + info);
     }
 }
