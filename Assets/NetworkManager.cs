@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System;
+using System.IO;
 
 public class NetworkManager : MonoBehaviour {
 
@@ -20,12 +21,20 @@ public class NetworkManager : MonoBehaviour {
     [SerializeField]
     private  InputField labelText;
     [SerializeField]
+    private GameObject  textEditorCanvas;
+    [SerializeField]
+    private InputField textField;
+    [SerializeField]
     private Button connectButton;
     private Text buttonText;
+
+    FileInfo f; 
+
     private enum ClimateStates {aberto, nublado, chuvoso, temporal }
     void Start()
     {
         buttonText = connectButton.GetComponentInChildren<Text>();
+        f = new FileInfo(Application.persistentDataPath + "\\" + "myFile.txt");
        // RefreshHostList();
        // MasterServer.ipAddress = Network.player.ipAddress;
       // MasterServer.port = 23466;
@@ -188,7 +197,56 @@ public class NetworkManager : MonoBehaviour {
         GetComponent<NetworkView>().RPC("receiveClimateChange", RPCMode.Server, (int)ClimateStates.temporal);
     }
 
+    public void notationPressed()
+    {
+       textEditorCanvas.SetActive(true);
+ 
+    }
+
+    public void endWritePressed()
+    {
+        if (!f.Exists)
+        {
+            message = "Creating File";
+            Save();
+        }
+        else
+        {
+            message = "Saving";
+            Save();
+        }
+        textEditorCanvas.SetActive(false);
+    }
+
+    private void Save()
+    {
+        StreamWriter w;
+        if (!f.Exists)
+        {
+            w = f.CreateText();
+        }
+        else
+        {
+            f.Delete();
+            w = f.CreateText();
+        }
+        if(textField.text!=null)
+            w.WriteLine(textField.text);
+        w.Close();
+        Debug.Log("Estou no fim do save");
+    }
+
+    public void Load()
+    {
+        StreamReader r = File.OpenText(Application.persistentDataPath + "\\" + "myFile.txt");
+        string info = r.ReadToEnd();
+        r.Close();
+        textField.text = info;
+        //data = info;
+    }
+
     private HostData[] hostList;
+    private string message;
    
 
     private void RefreshHostList()
