@@ -25,9 +25,14 @@ public class NetworkManager : MonoBehaviour {
     [SerializeField]
     private InputField textField;
     [SerializeField]
+    private Toggle lapseToggle;
+    [SerializeField]
+    private InputField lapseField;
+    [SerializeField]
     private Button connectButton;
     private Text buttonText;
 
+    private bool isGoingDown = false;
     FileInfo f; 
 
     private enum ClimateStates {aberto, nublado, chuvoso, temporal }
@@ -191,22 +196,54 @@ public class NetworkManager : MonoBehaviour {
     {
         GetComponent<NetworkView>().RPC("receiveClimateChange", RPCMode.Server, (int)ClimateStates.chuvoso);
     }
-
+    
     public void stormPressed()
     {
         GetComponent<NetworkView>().RPC("receiveClimateChange", RPCMode.Server, (int)ClimateStates.temporal);
     }
 
+
+    public void downPressed()
+    {
+        isGoingDown = !isGoingDown;
+        GetComponent<NetworkView>().RPC("receiveDownChange", RPCMode.Server, isGoingDown);
+   
+    }
+
+    public void lapsePressed()
+    {
+        String lapse;
+        if(lapseToggle.isOn)
+        {
+            lapse = lapseField.text;
+        }
+        else
+        {
+            lapse = null;
+        }
+        GetComponent<NetworkView>().RPC("receiveLapseChange", RPCMode.Server, lapse);
+    }
+
     public void notationPressed()
     {
        textEditorCanvas.SetActive(true);
+       if (f.Exists)
+       {
+           Load();
+       }
  
+    }
+
+    public void timeElapsingPressed()
+    {
+        GetComponent<NetworkView>().RPC("receiveTimeLapse", RPCMode.Server, (int)ClimateStates.temporal);
     }
 
     public void endWritePressed()
     {
         if (!f.Exists)
         {
+           
             message = "Creating File";
             Save();
         }
@@ -307,6 +344,18 @@ public class NetworkManager : MonoBehaviour {
         //send
     }
 
+    [RPC]
+    void receiveLapseChange(string lapse)
+    {
+        Debug.Log("New lapse is  " + lapse);
+       
+    }
+
+    [RPC]
+    void receiveDownChange(bool isDown)
+    {
+        Debug.Log("checar");
+    }
 
     void OnConnectedToServer()
     {
