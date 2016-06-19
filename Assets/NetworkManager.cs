@@ -32,13 +32,19 @@ public class NetworkManager : MonoBehaviour {
     private Button connectButton;
     private Text buttonText;
 
+    [SerializeField]
+    private Button lapseButton;
+    private Text lapseButtonText;
+
     private bool isGoingDown = false;
+    private bool lapseActive = false;
     FileInfo f; 
 
     private enum ClimateStates {aberto, nublado, chuvoso, temporal }
     void Start()
     {
         buttonText = connectButton.GetComponentInChildren<Text>();
+        lapseButtonText = lapseButton.GetComponentInChildren<Text>();
         f = new FileInfo(Application.persistentDataPath + "\\" + "myFile.txt");
        // RefreshHostList();
        // MasterServer.ipAddress = Network.player.ipAddress;
@@ -213,14 +219,27 @@ public class NetworkManager : MonoBehaviour {
     public void lapsePressed()
     {
         String lapse;
-        if(lapseToggle.isOn)
+        if (!lapseActive)
         {
-            lapse = lapseField.text;
+            lapseButtonText.text = "Desativar";
+            lapseActive = true;
         }
         else
         {
-            lapse = null;
+            lapseButtonText.text = "Ativar";
+            lapseActive = false;
+
+
         }
+       // if(lapseToggle.isOn)
+        //{
+            lapse = lapseField.text;
+        //}
+       // else
+       // {
+       //     lapse = null;
+       // }
+        
         GetComponent<NetworkView>().RPC("receiveLapseChange", RPCMode.Server, lapse);
     }
 
